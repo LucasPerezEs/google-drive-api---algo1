@@ -18,7 +18,8 @@ def crear_archivo():
         carpeta = input("Si desea crear el archivo en otra subcarpeta, copie y pegue el ID de la misma aqui. ")
     
     if len(parents) != 0:
-        metadata["parents"] = parents        
+        for i in range(len(parents)):
+            metadata["parents"] = parents[i]        
 
     media = MediaFileUpload(ruta, mimetype="image/jpeg")
     subir = SERVICIO.files().create(body=metadata, media_body=media, fields="id").execute()
@@ -26,4 +27,32 @@ def crear_archivo():
     if subir:
         print(f"{name} fue subido con exito. \n")
 
-crear_archivo()
+def crear_carpeta():
+    metadata = {}
+    
+    nombre = input("Ingrese el nombre de la carpeta que desea crear:  ")
+    metadata["name"] = nombre
+    
+    mime_type = "application/vnd.google-apps.folder"
+    metadata["mimeType"] = mime_type
+
+    parents = []
+    opcion = input("Desea crear la carpeta adentro de otra carpeta? (s/n) \n").lower()
+    if opcion == "s":
+        carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
+        parents.append(carpeta)
+        opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
+        while opcion == "s":
+            parents.append(carpeta)
+            carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
+            opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
+
+    if len(parents) != 0:
+        metadata["parents"] = parents
+
+    subir = SERVICIO.files().create(body=metadata).execute()
+
+    if subir:
+        print(f"\nLa carpeta {nombre} fue creada con exito. ")
+
+crear_carpeta()
