@@ -3,7 +3,7 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import os, io
 
 SERVICIO = obtener_servicio()
-MIME_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip"}
+MIME_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
 
 def definir_mime_type(nombre_archivo: str) -> str:
     nombre_separado = nombre_archivo.split(".")
@@ -23,7 +23,8 @@ def subir_archivo(nombre_archivo: str):
         opcion = int(input("Desea crear una carpeta o usar una existente?\n 1_Nueva Carpeta | 2_ Carpeta Existente "))
         
         if opcion == 1:
-            crear_carpeta()
+            nombre_carpeta = input("Que nombre le desea poner a la carpeta? ")
+            crear_carpeta(nombre_carpeta)
             carpeta = input("Copie y pegue el ID de la carpeta recien creada aqui. ")
             parents.append(carpeta)
         else:
@@ -38,7 +39,7 @@ def subir_archivo(nombre_archivo: str):
     subir = SERVICIO.files().create(body=metadata, media_body=media, fields="id").execute()
 
     if subir:
-        print(f"{nombre_archivo} fue subido con exito. \n")
+        print(f"El archivo [{nombre_archivo}] fue subido con exito. \n")
 
 def crear_archivo():
     crear = SERVICIO.files().create().execute()
@@ -90,4 +91,4 @@ def descargar_archivo(id_archivo: str, nombre_archivo: str):
         archivo.write(fh.read())
         archivo.close()
 
-subir_archivo("TP2_1C2021.pdf")
+subir_archivo("border ollie.jpg")
