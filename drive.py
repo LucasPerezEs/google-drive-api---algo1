@@ -91,4 +91,45 @@ def descargar_archivo(id_archivo: str, nombre_archivo: str):
         archivo.write(fh.read())
         archivo.close()
 
-subir_archivo("border ollie.jpg")
+
+def listar_por_parametro(query: str):
+    archivos = []
+    page_token = None
+    while True:
+        response = SERVICIO.files().list(q=query).execute()
+        for file in response.get('files', []):
+            # Process change
+            print('\t %s (%s)' % (file.get('name'), file.get('id')))
+            nombre_id = []
+            nombre_id.append(file.get('name'))
+            nombre_id.append(file.get('id'))
+            archivos.append(nombre_id)
+        page_token = response.get('nextPageToken', None)
+        if page_token is None:
+            break
+    
+    return archivos
+
+def navegacion_drive():
+    print("Lista de Carpetas")
+    print("Archivos:")
+    listar_por_parametro("mimeType!='application/vnd.google-apps.folder' and trashed=False")
+    
+    print("Carpetas:")
+    carpetas = listar_por_parametro("mimeType='application/vnd.google-apps.folder' and trashed=False")
+    for i in range(len(carpetas)):
+        print(f"Carpeta {i}: {carpetas[i][0]}")
+
+    opcion = input("Desea navegar a otra carpeta? (s/n) ").lower()
+    salir = False
+    while not salir:
+        if opcion == "s":
+            id_carpeta = input("Copie y pegue el ID de la carpeta a la que desea navegar aqui. ")
+            print("Archivos: ")
+            listar_por_parametro(f"mimeType!='application/vnd.google-apps.folder' and trashed=False and '{id_carpeta}' in parents")
+            print("Carpetas: ")
+            listar_por_parametro(f"mimeType='application/vnd.google-apps.folder' and trashed=False and '{id_carpeta}' in parents")
+            opcion = input("Desea navegar a otra carpeta? (s/n) ").lower()
+        else:
+            salir = True
+navegacion_drive()
