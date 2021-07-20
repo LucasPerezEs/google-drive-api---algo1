@@ -47,7 +47,8 @@ def crear_archivo():
     if crear:
         print("El archivo se ha creado con exito. ")
 
-def crear_carpeta(nombre_carpeta: str):
+def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str): # Si no se quiere crear la carpeta adentro de otra, en "id_carpeta_madre" poner un string vacio. Gracias!!
+
     metadata = {}
     
     metadata["name"] = nombre_carpeta
@@ -56,18 +57,18 @@ def crear_carpeta(nombre_carpeta: str):
     metadata["mimeType"] = mime_type
 
     parents = []
-    opcion = input("Desea crear la carpeta adentro de otra carpeta? (s/n) \n").lower()
-    if opcion == "s":
-        carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
-        parents.append(carpeta)
-        opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
-        while opcion == "s":
-            parents.append(carpeta)
-            carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
-            opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
-
-    if len(parents) != 0:
+    if len(id_carpeta_madre) != 0:
+        parents.append(id_carpeta_madre)
         metadata["parents"] = parents
+    #opcion = input("Desea crear la carpeta adentro de otra carpeta? (s/n) \n").lower()
+    #if opcion == "s":
+    #    carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
+    #    parents.append(carpeta)
+    #    opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
+    #    while opcion == "s":
+    #        parents.append(carpeta)
+    #        carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
+    #        opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
 
     subir = SERVICIO.files().create(body=metadata).execute()
 
@@ -143,4 +144,4 @@ def navegacion_drive():
         else:
             salir = True
 
-descargar_archivo("15onMn8C4RArDrIrQyGzgP7YSGL2_E7Jh", "espidernan.jpg", r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos\Repositorios\DriveHub\descargas prueba")
+crear_carpeta("Mateo Messi", "1g2naadyNBQt__iVJlrYGDH9dCwX_zPna")
