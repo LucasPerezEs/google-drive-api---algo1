@@ -91,7 +91,6 @@ def descargar_archivo(id_archivo: str, nombre_archivo: str):
         archivo.write(fh.read())
         archivo.close()
 
-
 def listar_por_parametro(query: str):
     archivos = []
     page_token = None
@@ -132,4 +131,5 @@ def navegacion_drive():
             opcion = input("Desea navegar a otra carpeta? (s/n) ").lower()
         else:
             salir = True
+
 navegacion_drive()
