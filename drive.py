@@ -13,27 +13,37 @@ def definir_mime_type(nombre_archivo: str) -> str:
     
     return mime
 
-def subir_archivo(nombre_archivo: str):
+def subir_archivo(nombre_archivo: str, id_carpeta_madre: str, nombre_carpeta_nueva: str): # Si no quiere subir el archivo adentro de una carpeta, en "id_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
+
     metadata = {"name" : nombre_archivo}
     directorio = os.path.dirname(os.path.realpath(nombre_archivo))
     ruta = os.path.join(directorio, nombre_archivo)
         
     parents = []
-    opcion = input("Desea crear el archivo en una carpeta? (s/n) ").lower()
-    if opcion == "s":
-        opcion = int(input("Desea crear una carpeta o usar una existente?\n 1_Nueva Carpeta | 2_ Carpeta Existente "))
-        
-        if opcion == 1:
-            nombre_carpeta = input("Que nombre le desea poner a la carpeta? ")
-            crear_carpeta(nombre_carpeta)
-            carpeta = input("Copie y pegue el ID de la carpeta recien creada aqui. ")
-            parents.append(carpeta)
-        else:
-            carpeta = input("Copie y pegue el ID de la carpeta donde desea crear el archivo ")
-            parents.append(carpeta)
+    if len(id_carpeta_madre) != 0:
+        parents.append(id_carpeta_madre)
+        metadata["parents"] = parents
+    
+    if len(nombre_carpeta_nueva) != 0:
+        id_nueva_carpeta = crear_carpeta(nombre_carpeta_nueva, "")
+        parents.append(id_nueva_carpeta)
+        metadata["parents"] = parents
+    
+    #opcion = input("Desea crear el archivo en una carpeta? (s/n) ").lower()
+    #if opcion == "s":
+    #    opcion = int(input("Desea crear una carpeta o usar una existente?\n 1_Nueva Carpeta | 2_ Carpeta Existente "))
+    #    
+    #    if opcion == 1:
+    #        nombre_carpeta = input("Que nombre le desea poner a la carpeta? ")
+    #        crear_carpeta(nombre_carpeta)
+    #        carpeta = input("Copie y pegue el ID de la carpeta recien creada aqui. ")
+    #        parents.append(carpeta)
+    #    else:
+    #        carpeta = input("Copie y pegue el ID de la carpeta donde desea crear el archivo ")
+    #        parents.append(carpeta)
             
-    if len(parents) != 0:
-        metadata["parents"] = parents        
+    #if len(parents) != 0:
+    #    metadata["parents"] = parents        
 
     mime = definir_mime_type(nombre_archivo)
     media = MediaFileUpload(ruta, mimetype=mime)
@@ -47,7 +57,7 @@ def crear_archivo():
     if crear:
         print("El archivo se ha creado con exito. ")
 
-def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str): # Si no se quiere crear la carpeta adentro de otra, en "id_carpeta_madre" poner un string vacio. Gracias!!
+def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str) -> str: # Si no se quiere crear la carpeta adentro de otra, en "id_carpeta_madre" poner un string vacio. Gracias!!
 
     metadata = {}
     
@@ -60,20 +70,16 @@ def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str): # Si no se quiere
     if len(id_carpeta_madre) != 0:
         parents.append(id_carpeta_madre)
         metadata["parents"] = parents
-    #opcion = input("Desea crear la carpeta adentro de otra carpeta? (s/n) \n").lower()
-    #if opcion == "s":
-    #    carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
-    #    parents.append(carpeta)
-    #    opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
-    #    while opcion == "s":
-    #        parents.append(carpeta)
-    #        carpeta = input("Copie y pegue el ID de la carpeta en donde desea meter la carpeta. ")
-    #        opcion = input("Desea especificar una subcarpeta? (s/n)").lower()
 
     subir = SERVICIO.files().create(body=metadata).execute()
 
     if subir:
         print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
+    
+    id_carpeta = subir.get("id")
+    
+
+    return id_carpeta
 
 def descargar_archivo(id_archivo: str, nombre_archivo: str, ruta: str) -> None:     # Al pasar el string de la ruta destino, poner una "r" antes del string, como si fuera la "f" de format. Ej: descargar_archivo(id_archivo, messi.jpg, r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos")
     
@@ -144,4 +150,4 @@ def navegacion_drive():
         else:
             salir = True
 
-crear_carpeta("Mateo Messi", "1g2naadyNBQt__iVJlrYGDH9dCwX_zPna")
+subir_archivo("hernan.jpg", "1jIYKsPRfnen0vzleVgOVjl_vrPHdb7rs", "")
