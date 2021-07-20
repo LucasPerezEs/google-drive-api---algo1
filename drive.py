@@ -1,6 +1,7 @@
 from service_drive import obtener_servicio
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import os, io
+import pickle
 
 SERVICIO = obtener_servicio()
 MIME_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
@@ -73,8 +74,11 @@ def crear_carpeta(nombre_carpeta: str):
     if subir:
         print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
 
-def descargar_archivo(id_archivo: str, nombre_archivo: str):
+def descargar_archivo(id_archivo: str, nombre_archivo: str, ruta: str) -> None:     # Al pasar el string de la ruta destino, poner una "r" antes del string, como si fuera la "f" de format. Ej: descargar_archivo(id_archivo, messi.jpg, r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos")
     
+    nombre_separado = nombre_archivo.split(".")
+    nombre_sin_extension = nombre_separado[0]
+
     descargar = SERVICIO.files().get_media(fileId=id_archivo)
     fh = io.BytesIO()
     media = MediaIoBaseDownload(fh, descargar)
@@ -83,13 +87,18 @@ def descargar_archivo(id_archivo: str, nombre_archivo: str):
         status, done = media.next_chunk()
         print( "Download %d%%." % int(status.progress() * 100))
     
-    ruta = input("Ingrese la ruta de la ubicacion donde quiere descargar el archivo ")
+    ruta_destino = ruta
 
     fh.seek(0)
 
-    with open(os.path.join(ruta, nombre_archivo), "wb") as archivo:
+    with open(os.path.join(ruta_destino, nombre_archivo), "wb") as archivo:
         archivo.write(fh.read())
         archivo.close()
+
+    fh.seek(0)
+    with open(os.path.join(ruta_destino, nombre_sin_extension + ".dat"), "wb") as archivo_binario:
+        pickle.dump(fh.read(), archivo_binario)
+        archivo_binario.close()
 
 def listar_por_parametro(query: str):
     archivos = []
@@ -97,12 +106,14 @@ def listar_por_parametro(query: str):
     while True:
         response = SERVICIO.files().list(q=query).execute()
         for file in response.get('files', []):
-            # Process change
+
             print('\t %s (%s)' % (file.get('name'), file.get('id')))
+            
             nombre_id = []
             nombre_id.append(file.get('name'))
             nombre_id.append(file.get('id'))
             archivos.append(nombre_id)
+        
         page_token = response.get('nextPageToken', None)
         if page_token is None:
             break
@@ -132,4 +143,4 @@ def navegacion_drive():
         else:
             salir = True
 
-navegacion_drive()
+descargar_archivo("15onMn8C4RArDrIrQyGzgP7YSGL2_E7Jh", "espidernan.jpg", r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos\Repositorios\DriveHub\descargas prueba")
