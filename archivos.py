@@ -1,11 +1,6 @@
 import os
 
 
-
-
-
-
-
 def listar_archivo():
     archivos = int(input("Para ver los archivos en local presione 1, para ver los archivos en remoto presione 2: "))
     while archivos == 1:
@@ -35,6 +30,16 @@ def nueva_carpeta():
 def actualizar_entregas():
     pass
 
+def validar_opcion_modificacion(mensaje_input, mensaje_error, tope_inferior, tope_superior):
+    '''
+    Pre: Recibe mensajes de input y error, el tope inferior y el superior.
+    Post:Retorna la opcion validada por el usuario
+    '''
+    respuesta = input(mensaje_input)
+    while(not respuesta.isnumeric() or int(respuesta) > tope_superior or int(respuesta) < tope_inferior):
+        print(mensaje_error)
+        respuesta = input(mensaje_input)
+    return int(respuesta)
 
 def opciones(opcion, cursos):
     '''
