@@ -27,23 +27,7 @@ def subir_archivo(nombre_archivo: str, id_carpeta_madre: str, nombre_carpeta_nue
     if len(nombre_carpeta_nueva) != 0:
         id_nueva_carpeta = crear_carpeta(nombre_carpeta_nueva, "")
         parents.append(id_nueva_carpeta)
-        metadata["parents"] = parents
-    
-    #opcion = input("Desea crear el archivo en una carpeta? (s/n) ").lower()
-    #if opcion == "s":
-    #    opcion = int(input("Desea crear una carpeta o usar una existente?\n 1_Nueva Carpeta | 2_ Carpeta Existente "))
-    #    
-    #    if opcion == 1:
-    #        nombre_carpeta = input("Que nombre le desea poner a la carpeta? ")
-    #        crear_carpeta(nombre_carpeta)
-    #        carpeta = input("Copie y pegue el ID de la carpeta recien creada aqui. ")
-    #        parents.append(carpeta)
-    #    else:
-    #        carpeta = input("Copie y pegue el ID de la carpeta donde desea crear el archivo ")
-    #        parents.append(carpeta)
-            
-    #if len(parents) != 0:
-    #    metadata["parents"] = parents        
+        metadata["parents"] = parents     
 
     mime = definir_mime_type(nombre_archivo)
     media = MediaFileUpload(ruta, mimetype=mime)
@@ -150,4 +134,12 @@ def navegacion_drive():
         else:
             salir = True
 
-subir_archivo("hernan.jpg", "1jIYKsPRfnen0vzleVgOVjl_vrPHdb7rs", "")
+def mover_archivo(id_archivo:str, id_carpeta_vieja: str, id_carpeta_nueva: str): # Si no se quiere remover carpetas madre, en "id_carpeta_vieja" pasar string vacio, lo mismo para agregar carpetas madre en "id_carpeta_nueva".
+    
+    if len(id_carpeta_vieja) != 0:
+        mover = SERVICIO.files().update(fileId=id_archivo, removeParents=id_carpeta_vieja).execute()
+    
+    if len(id_carpeta_nueva) != 0:
+        mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()
+
+mover_archivo("1xHNKNs0zx3VkfPladHXh8R-hrHSrBcI5", "1dOIcta7R7xFmD93lmNyhYF2owte-m6l_", "1kCy_brc9UOjw1AMSAKjR6DJGSXBIfgSK")
