@@ -1,31 +1,47 @@
 import os
+from drive import subir_archivo, crear_archivo, descargar_archivo, listar_por_parametro, crear_carpeta
+#f"mimeType!='application/vnd.google-apps.folder' and trashed=False
 
 
-def listar_archivo():
+def listar_archivos(query):
     archivos = int(input("Para ver los archivos en local presione 1, para ver los archivos en remoto presione 2: "))
-    while archivos == 1:
-        lista_de_archivos = os.listdir(ruta_de_la_carpeta)
-    pass
-
-
-def crear_archivo():
+    if archivos == 1 :
+        lista_de_archivos = os.listdir('RUTA CARPETA')
+    elif archivos == 2 :
+        listar_por_parametro(query)
     
-    file = open("/ruta/filename.txt", "w")
-    file.write("Primera línea" + os.linesep)
-    file.write("Segunda línea")
-    file.close()
+def crear_archivos():
+    archivos = int(input("Para crear un archivo localmente presione 1, para crearlo remotamente (Drive) presione 2: "))
+    if archivos == 1: #CREAR CARPETA TMBIEN
+        nombre = input("Ingrese el nombre del nuevo archivo: ")
+        file = open(r"C:\Users\lucas\OneDrive\Escritorio\TP2\Evaluaciones\{}.txt".format(nombre), "w")
+        file.write("Primera línea" + os.linesep) #ESCRIBIR LO QUE SE TE OCURRA
+        file.write("Segunda línea")
+        file.close()
 
-def subir_archivo():
-    pass
+    elif archivos == 2:
+        crear_archivo()
 
-def descarga_archivos():
-    pass
+def subir_archivos(): #PREGUNTAR SI SIRVE PARA PUNTO 7
+    nombre = input("Ingrese el nombre y extension del archivo que desea subir: ")
+    carpeta_madre = input("Si desea poner el archivo en una carpeta existente, ingrese su ID, si no, presione enter: ") #Corregir
+    nueva_carpeta = input("Si quiere crear una nueva carpeta, ingrese el nombre: ")
+    subir_archivo(nombre, carpeta_madre,nueva_carpeta)
+    
+def descargar_archivos (): 
+    id_archivo = input("Ingrese el ID del archivo que desea descargar: ")
+    nombre_archivo = input("Ingrese el nombre y extension del archivo que desea descargar: ")
+    ruta = input("Copie la ruta en donde desea descargar el archivo: ")
+    descargar_archivo(id_archivo, nombre_archivo, ruta)
 
 def sincronizacion():
     pass
 
 def nueva_carpeta():
-    pass
+    archivos = int(input("Para crear un archivo localmente presione 1, para crearlo remotamente (Drive) presione 2: "))
+    while archivos == 1:
+        pass
+    while archivos == 2:()
 
 def actualizar_entregas():
     pass
@@ -41,18 +57,18 @@ def validar_opcion_modificacion(mensaje_input, mensaje_error, tope_inferior, top
         respuesta = input(mensaje_input)
     return int(respuesta)
 
-def opciones(opcion, cursos):
+def opciones(opcion):
     '''
     Pre: Recibe la opcion del menu y una lista con los cursos sin asistentes al principio
     '''
     if(opcion == 1):
-        listar_archivo()
+        listar_archivos(f"mimeType!='application/vnd.google-apps.folder' and trashed=False")
     elif(opcion == 2):
-        crear_archivo()
+        crear_archivos()
     elif(opcion == 3):
-        subir_archivo()
+        subir_archivos()
     elif(opcion == 4):
-        descarga_archivos()
+        descargar_archivos()
     elif(opcion == 5):
         sincronizacion()
     elif(opcion == 6):
@@ -81,7 +97,7 @@ def main():
 
         8.Cerrar el programa ''')
 
-        opcion = #validar_opcion_modificacion('Ingrese una opcion: ', 'Ingreso invalido', 1, 8)
+        opcion = validar_opcion_modificacion('Ingrese una opcion: ', 'Ingreso invalido', 1, 8)
         if(opcion != 8):
             opciones(opcion)
         else:
