@@ -15,27 +15,23 @@ def carpetas():
         next(csv_reader)
         for row in csv_reader:
             DOCENTE_ALUMNO[row[0]]=[]
-    print(DOCENTE_ALUMNO)
 
     with open("docente-alumnos.csv", newline='',encoding="UTF-8") as correctores_csv:
         csv_reader=csv.reader(correctores_csv, delimiter=',')
         next(csv_reader)
         for row in csv_reader:
             DOCENTE_ALUMNO[row[0]].append(row[1])
-    print(DOCENTE_ALUMNO)
 
     with open("alumnos.csv", newline='', encoding="UTF-8") as alumnos_csv:
         csv_reader=csv.reader(alumnos_csv, delimiter=',')
         next(csv_reader)
         for row in csv_reader:
             ALUMNOS_SIN_DOCENTE.append(row[0])
-        print(ALUMNOS_SIN_DOCENTE)
     
     for docente in DOCENTE_ALUMNO.keys():
         for alumno in DOCENTE_ALUMNO[docente]:
             if alumno in ALUMNOS_SIN_DOCENTE:
                 ALUMNOS_SIN_DOCENTE.remove(alumno)
-    print(ALUMNOS_SIN_DOCENTE)
     carpeta=input("Ingrese el nombre de la carpeta que contendra la entrega de los alumnos: ")
     mkdir(carpeta)
     id_madre = crear_carpeta(carpeta,"")
