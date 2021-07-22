@@ -1,24 +1,37 @@
 from os import mkdir
 import csv
+from drive import crear_carpeta
 
-def crear_carpetas():
+def crear_carpetas_local():
     nombre_carpeta=input("Ingresa el nombre de la carpeta: ")
     mkdir(nombre_carpeta)
 
 
-def carpetas_locales(DOCENTE_ALUMNO):
-    mkdir("nueva_carpeta")#NECESITO EL ASUNTO DE GMAIL PARA EL NOMBRE DE LA CARPETA
+def carpetas(DOCENTE_ALUMNO,ALUMNOS_SIN_DOCENTE):
+    carpeta=input("Ingrese el nombre de la carpeta que contendra la entrega de los alumnos: ")
+    mkdir(carpeta)
+    id_madre = crear_carpeta(carpeta,"")
     for docente in DOCENTE_ALUMNO.keys():
-        mkdir(f"nueva_carpeta\\{docente}")
+        mkdir(f"{carpeta}\\{docente}")
+        id_docente = crear_carpeta(docente, id_madre)
         for alumno in DOCENTE_ALUMNO[docente]:
-            mkdir(f"nueva_carpeta\\{docente}\\{alumno}")
+            mkdir(f"{carpeta}\\{docente}\\{alumno}")
+            crear_carpeta(alumno, id_docente)
+            #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
+    mkdir(f"{carpeta}\\Alumnos sin docente")
+    id_huerfanos = crear_carpeta("Alumnos sin docente", id_madre)
+    for alumno in ALUMNOS_SIN_DOCENTE:
+        mkdir(f"{carpeta}\\Alumnos sin docente\\{alumno}")
+        crear_carpeta(alumno, id_huerfanos)
+        #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
+
     
 
 
 
 def main():
     DOCENTE_ALUMNO={} #{"DOCENTE":[ALUMNO1,ALUMNO2],"DOCENTE2":[ALUMNO1,ALUMNO2]}
-    ALUMNOS_SIN_DOCENTE={} #{ALUMNO:PADRON,ALUMNO2:PADRON2}  CONVIENE MAS UNA LISTA?
+    ALUMNOS_SIN_DOCENTE=[] #{ALUMNO:PADRON,ALUMNO2:PADRON2}  CONVIENE MAS UNA LISTA?
     with open("docentes.csv", newline='', encoding="UTF-8") as archivo_csv:
         csv_reader=csv.reader(archivo_csv, delimiter=',')
         next(csv_reader)
@@ -37,10 +50,15 @@ def main():
         csv_reader=csv.reader(alumnos_csv, delimiter=',')
         next(csv_reader)
         for row in csv_reader:
-            ALUMNOS_SIN_DOCENTE[row[0]]=row[1]
+            ALUMNOS_SIN_DOCENTE.append(row[0])
         print(ALUMNOS_SIN_DOCENTE)
     
+    for docente in DOCENTE_ALUMNO.keys():
+        for alumno in DOCENTE_ALUMNO[docente]:
+            if alumno in ALUMNOS_SIN_DOCENTE:
+                ALUMNOS_SIN_DOCENTE.remove(alumno)
+    print(ALUMNOS_SIN_DOCENTE)
     
-    '''carpetas_locales(DOCENTE_ALUMNO)'''
+    carpetas(DOCENTE_ALUMNO,ALUMNOS_SIN_DOCENTE)
 
 main()
