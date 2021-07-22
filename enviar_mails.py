@@ -13,11 +13,11 @@ def main():
 
     entregas_validas = entrega[0]
     entregas_invalidas = entrega[1]
-    poronga = True
-    culo = True
+    valido = True
+    invalido = True
 
-    mensaje_valido = crear_mensaje(entregas_validas, poronga)
-    mensaje_invalido = crear_mensaje(entregas_invalidas, culo)
+    mensaje_valido = crear_mensaje(entregas_validas, valido)
+    mensaje_invalido = crear_mensaje(entregas_invalidas, invalido)
 
     enviar_mensaje(service, mensaje_valido)
     enviar_mensaje(service, mensaje_invalido)
