@@ -13,8 +13,16 @@ def definir_mime_type(nombre_archivo: str) -> str:
     
     return mime
 
-def subir_archivo(nombre_archivo: str, id_carpeta_madre: str, nombre_carpeta_nueva: str): # Si no quiere subir el archivo adentro de una carpeta, en "id_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
+def obtener_id(nombre_carpeta: str):
+    query = f"mimeType='application/vnd.google-apps.folder' and trashed=False"
+    response = SERVICIO.files().list(q=query).execute()
+    for file in response.get('files', []):
+        if file['name'] == nombre_carpeta:
+            id_carpeta = file.get('id')
+            return id_carpeta
 
+def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str): # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
+    id_carpeta_madre = obtener_id(nombre_carpeta_madre)
     metadata = {"name" : nombre_archivo}
     directorio = os.path.dirname(os.path.realpath(nombre_archivo))
     ruta = os.path.join(directorio, nombre_archivo)
@@ -98,7 +106,7 @@ def listar_por_parametro(query: str):
         response = SERVICIO.files().list(q=query).execute()
         for file in response.get('files', []):
 
-            print('\t %s (%s)' % (file.get('name'), file.get('id')))
+            print('\t %s (%s) (%s)' % (file.get('name'), file.get('id'), file.get('modifiedTime')))
             
             nombre_id = []
             nombre_id.append(file.get('name'))
@@ -118,8 +126,8 @@ def navegacion_drive():
     
     print("Carpetas:")
     carpetas = listar_por_parametro("mimeType='application/vnd.google-apps.folder' and trashed=False")
-    for i in range(len(carpetas)):
-        print(f"Carpeta {i}: {carpetas[i][0]}")
+    #for i in range(len(carpetas)):
+    #    print(f"Carpeta {i}: {carpetas[i][0]}")
 
     opcion = input("Desea navegar a otra carpeta? (s/n) ").lower()
     salir = False
@@ -140,6 +148,7 @@ def mover_archivo(id_archivo:str, id_carpeta_vieja: str, id_carpeta_nueva: str):
         mover = SERVICIO.files().update(fileId=id_archivo, removeParents=id_carpeta_vieja).execute()
     
     if len(id_carpeta_nueva) != 0:
-        mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()
+        mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()    
 
-mover_archivo("1xHNKNs0zx3VkfPladHXh8R-hrHSrBcI5", "1dOIcta7R7xFmD93lmNyhYF2owte-m6l_", "1kCy_brc9UOjw1AMSAKjR6DJGSXBIfgSK")
+id = obtener_id("BRASIL")
+print(id)
