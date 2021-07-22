@@ -7,31 +7,9 @@ def crear_carpetas_local():
     mkdir(nombre_carpeta)
 
 
-def carpetas(DOCENTE_ALUMNO,ALUMNOS_SIN_DOCENTE):
-    carpeta=input("Ingrese el nombre de la carpeta que contendra la entrega de los alumnos: ")
-    mkdir(carpeta)
-    id_madre = crear_carpeta(carpeta,"")
-    for docente in DOCENTE_ALUMNO.keys():
-        mkdir(f"{carpeta}\\{docente}")
-        id_docente = crear_carpeta(docente, id_madre)
-        for alumno in DOCENTE_ALUMNO[docente]:
-            mkdir(f"{carpeta}\\{docente}\\{alumno}")
-            crear_carpeta(alumno, id_docente)
-            #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
-    mkdir(f"{carpeta}\\Alumnos sin docente")
-    id_huerfanos = crear_carpeta("Alumnos sin docente", id_madre)
-    for alumno in ALUMNOS_SIN_DOCENTE:
-        mkdir(f"{carpeta}\\Alumnos sin docente\\{alumno}")
-        crear_carpeta(alumno, id_huerfanos)
-        #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
-
-    
-
-
-
-def main():
+def carpetas():
     DOCENTE_ALUMNO={} #{"DOCENTE":[ALUMNO1,ALUMNO2],"DOCENTE2":[ALUMNO1,ALUMNO2]}
-    ALUMNOS_SIN_DOCENTE=[] #{ALUMNO:PADRON,ALUMNO2:PADRON2}  CONVIENE MAS UNA LISTA?
+    ALUMNOS_SIN_DOCENTE=[] 
     with open("docentes.csv", newline='', encoding="UTF-8") as archivo_csv:
         csv_reader=csv.reader(archivo_csv, delimiter=',')
         next(csv_reader)
@@ -58,7 +36,20 @@ def main():
             if alumno in ALUMNOS_SIN_DOCENTE:
                 ALUMNOS_SIN_DOCENTE.remove(alumno)
     print(ALUMNOS_SIN_DOCENTE)
-    
-    carpetas(DOCENTE_ALUMNO,ALUMNOS_SIN_DOCENTE)
-
-main()
+    carpeta=input("Ingrese el nombre de la carpeta que contendra la entrega de los alumnos: ")
+    mkdir(carpeta)
+    id_madre = crear_carpeta(carpeta,"")
+    for docente in DOCENTE_ALUMNO.keys():
+        mkdir(f"{carpeta}\\{docente}")
+        id_docente = crear_carpeta(docente, id_madre)
+        for alumno in DOCENTE_ALUMNO[docente]:
+            mkdir(f"{carpeta}\\{docente}\\{alumno}")
+            crear_carpeta(alumno, id_docente)
+            #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
+    mkdir(f"{carpeta}\\Alumnos sin docente")
+    id_huerfanos = crear_carpeta("Alumnos sin docente", id_madre)
+    for alumno in ALUMNOS_SIN_DOCENTE:
+        mkdir(f"{carpeta}\\Alumnos sin docente\\{alumno}")
+        crear_carpeta(alumno, id_huerfanos)
+        #ACA HAY QUE PONER LOS ARCHIVOS DE LA ENTREGA DEL ALUMNO
+    return DOCENTE_ALUMNO, ALUMNOS_SIN_DOCENTE, carpeta
