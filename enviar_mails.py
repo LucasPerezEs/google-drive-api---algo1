@@ -13,18 +13,18 @@ def main():
 
     entregas_validas = entrega[0]
     entregas_invalidas = entrega[1]
-    poronga = True
-    culo = True
+    valido = True
+    falso = False
 
-    mensaje_valido = crear_mensaje(entregas_validas, poronga)
-    mensaje_invalido = crear_mensaje(entregas_invalidas, culo)
+    mensaje_valido = crear_mensaje(entregas_validas, valido)
+    mensaje_invalido = crear_mensaje(entregas_invalidas, falso)
 
     enviar_mensaje(service, mensaje_valido)
     enviar_mensaje(service, mensaje_invalido)
 
-def crear_mensaje(entrega, booleano):
+def crear_mensaje(entrega, estado):
 
-    if booleano == True:
+    if estado == True:
     #entrega = validar_entregas(service)
 
         for i in entrega:
@@ -80,7 +80,7 @@ def validar_entregas(service):
             if numero > 0:
                 print("ok")
                 entregas_validas.append(id_mails[i])
-            #if asuntos[1] in #csv
+            #if asuntos[1] in #csv   VERIFICAR QUE ALUMNO ESTE EN LA CATEDRA
         except:
             entregas_invalidas.append(id_mails[i])
             print(asuntos)
