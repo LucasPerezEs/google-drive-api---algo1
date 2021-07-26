@@ -14,7 +14,7 @@ def obtener_padrones():
             csv_reader=csv.reader(alumnos_csv, delimiter=',')
             next(csv_reader)
             for row in csv_reader:
-                padrones[row[0]]=row[1]
+                padrones[row[1]]=row[0]
     return padrones
 
 def crear_datos(condicion, docente_alumno):
@@ -53,7 +53,6 @@ def crear_datos(condicion, docente_alumno):
 
                     alumnos_sin_docente.remove(alumno)
         return alumnos_sin_docente
-
 
 
 def carpetas():
