@@ -14,7 +14,7 @@ def obtener_padrones():
             csv_reader=csv.reader(alumnos_csv, delimiter=',')
             next(csv_reader)
             for row in csv_reader:
-                padrones.append(alumnos_csv[row][1])
+                padrones.append(row[1])
     return padrones
 
 
