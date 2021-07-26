@@ -8,15 +8,14 @@ def crear_carpetas_local():
 
 
 def obtener_padrones():
-    padrones=[]
+    padrones={}
     with open("alumnos.csv", newline='', encoding="UTF-8") as alumnos_csv:
 
             csv_reader=csv.reader(alumnos_csv, delimiter=',')
             next(csv_reader)
             for row in csv_reader:
-                padrones.append(row[1])
+                padrones[row[0]]=row[1]
     return padrones
-
 
 def crear_datos(condicion, docente_alumno):
     if condicion== True:
