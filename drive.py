@@ -21,7 +21,7 @@ def obtener_id(nombre: str, query) -> str:
             id_carpeta = file.get('id')
             return id_carpeta
 
-def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str): # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
+def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str) -> None: # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
     id_carpeta_madre = obtener_id(nombre_carpeta_madre, f"mimeType='application/vnd.google-apps.folder' and trashed=False")
     metadata = {"name" : nombre_archivo}
     directorio = os.path.dirname(os.path.realpath(nombre_archivo))
@@ -44,7 +44,7 @@ def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta
     if subir:
         print(f"El archivo [{nombre_archivo}] fue subido con exito. \n")
 
-def crear_archivo(): # Hacer que escriba algo
+def crear_archivo() -> None: # Hacer que escriba algo
     crear = SERVICIO.files().create().execute()
     if crear:
         print("El archivo se ha creado con exito. ")
@@ -108,7 +108,7 @@ def listar_por_parametro(query: str) -> list :
         response = SERVICIO.files().list(q=query).execute()
         for file in response.get('files', []):
 
-            print('\t %s (%s) (%s)' % (file.get('name'), file.get('id'), file.get('modifiedTime')))
+            print('\t %s' % (file.get('name')))
             
             nombre_id = []
             nombre_id.append(file.get('name'))
@@ -121,21 +121,20 @@ def listar_por_parametro(query: str) -> list :
     
     return archivos
 
-def navegacion_drive():
+def navegacion_drive() -> None:
     print("Lista de Carpetas")
     print("Archivos:")
     listar_por_parametro("mimeType!='application/vnd.google-apps.folder' and trashed=False")
     
     print("Carpetas:")
     carpetas = listar_por_parametro("mimeType='application/vnd.google-apps.folder' and trashed=False")
-    #for i in range(len(carpetas)):
-    #    print(f"Carpeta {i}: {carpetas[i][0]}")
 
     opcion = input("Desea navegar a otra carpeta? (s/n) ").lower()
     salir = False
     while not salir:
         if opcion == "s":
-            id_carpeta = input("Copie y pegue el ID de la carpeta a la que desea navegar aqui. ")
+            carpeta = input("Ingrese el nombre de la carpeta a la que desea navegar aqui. ")
+            id_carpeta = obtener_id(carpeta, "mimeType='application/vnd.google-apps.folder' and trashed=False")
             print("Archivos: ")
             listar_por_parametro(f"mimeType!='application/vnd.google-apps.folder' and trashed=False and '{id_carpeta}' in parents")
             print("Carpetas: ")
@@ -144,12 +143,24 @@ def navegacion_drive():
         else:
             salir = True
 
-def mover_archivo(id_archivo:str, id_carpeta_vieja: str, id_carpeta_nueva: str): # Si no se quiere remover carpetas madre, en "id_carpeta_vieja" pasar string vacio, lo mismo para agregar carpetas madre en "id_carpeta_nueva".
+def mover_archivo(id_archivo:str, id_carpeta_vieja: str, id_carpeta_nueva: str) -> None: # Si no se quiere remover carpetas madre, en "id_carpeta_vieja" pasar string vacio, lo mismo para agregar carpetas madre en "id_carpeta_nueva".
     
     if len(id_carpeta_vieja) != 0:
         mover = SERVICIO.files().update(fileId=id_archivo, removeParents=id_carpeta_vieja).execute()
     
     if len(id_carpeta_nueva) != 0:
-        mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()    
+        mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()
 
-descargar_archivo("caracreeper.jpg", r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos\Repositorios\DriveHub\Tp-DriveHub---Lucas-al-Cubo\Primer Parcial 2021")
+def obtener_tiempo_modificacion(nombre_archivo: str):
+    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
+    fecha_mod = SERVICIO.files().get(fileId=id_archivo, fields="modifiedTime").execute()
+
+    lista_completa = fecha_mod['modifiedTime'].split("T")
+    dia = lista_completa[0]
+    hora_completa = lista_completa[1].split(".")
+    hora = hora_completa[0]
+    
+    return (dia, hora)
+
+fecha = obtener_tiempo_modificacion("Messi.xlsx")
+print(fecha)
