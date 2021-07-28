@@ -158,9 +158,9 @@ def obtener_tiempo_modificacion(nombre_archivo: str):
     lista_completa = fecha_mod['modifiedTime'].split("T")
     dia = lista_completa[0]
     hora_completa = lista_completa[1].split(".")
-    hora = hora_completa[0]
+    hora_utc = hora_completa[0].split(":")
+    hora_arg = str(int(hora_utc[0]) - 3)
+    hora_final = [hora_arg, hora_utc[1], hora_utc[2]]
+    hora_final = ":".join(hora_final)
     
-    return (dia, hora)
-
-fecha = obtener_tiempo_modificacion("Messi.xlsx")
-print(fecha)
+    return (dia, hora_final)
