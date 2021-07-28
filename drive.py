@@ -151,16 +151,22 @@ def mover_archivo(id_archivo:str, id_carpeta_vieja: str, id_carpeta_nueva: str) 
     if len(id_carpeta_nueva) != 0:
         mover = SERVICIO.files().update(fileId=id_archivo, addParents=id_carpeta_nueva).execute()
 
-def obtener_tiempo_modificacion(nombre_archivo: str):
-    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
-    fecha_mod = SERVICIO.files().get(fileId=id_archivo, fields="modifiedTime").execute()
+def obtener_tiempo_modificacion(nombre_archivo: str) -> tuple:
+    try:
+        id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
+        fecha_mod = SERVICIO.files().get(fileId=id_archivo, fields="modifiedTime").execute()
 
-    lista_completa = fecha_mod['modifiedTime'].split("T")
-    dia = lista_completa[0]
-    hora_completa = lista_completa[1].split(".")
-    hora_utc = hora_completa[0].split(":")
-    hora_arg = str(int(hora_utc[0]) - 3)
-    hora_final = [hora_arg, hora_utc[1], hora_utc[2]]
-    hora_final = ":".join(hora_final)
-    
-    return (dia, hora_final)
+        lista_completa = fecha_mod['modifiedTime'].split("T")
+        dia = lista_completa[0]
+        hora_completa = lista_completa[1].split(".")
+        hora_utc = hora_completa[0].split(":")
+        hora_arg = str(int(hora_utc[0]) - 3)
+        hora_final = [hora_arg, hora_utc[1], hora_utc[2]]
+        hora_final = ":".join(hora_final)
+        
+        return (dia, hora_final)
+    except:
+        return ()
+
+messi =obtener_tiempo_modificacion("ilolay.png")
+print(messi)
