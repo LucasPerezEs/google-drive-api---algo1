@@ -21,11 +21,13 @@ def obtener_id(nombre: str, query) -> str:
             id_carpeta = file.get('id')
             return id_carpeta
 
-def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str) -> None: # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
+def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str, ruta:str) -> None: # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
     id_carpeta_madre = obtener_id(nombre_carpeta_madre, f"mimeType='application/vnd.google-apps.folder' and trashed=False")
     metadata = {"name" : nombre_archivo}
-    directorio = os.path.dirname(os.path.realpath(nombre_archivo))
-    ruta = os.path.join(directorio, nombre_archivo)
+    
+    if ruta != "":
+        directorio = os.path.dirname(os.path.realpath(nombre_archivo))
+        ruta = os.path.join(directorio, nombre_archivo)
         
     parents = []
     if len(id_carpeta_madre) != 0:
@@ -167,6 +169,3 @@ def obtener_tiempo_modificacion(nombre_archivo: str) -> tuple:
         return (dia, hora_final)
     except:
         return ()
-
-messi =obtener_tiempo_modificacion("ilolay.png")
-print(messi)
