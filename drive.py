@@ -5,7 +5,7 @@ import pickle
 
 SERVICIO = obtener_servicio()
 
-MIME_TYPES = {"csv": "text/csv",  "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
+MIME_TYPES = {"csv": "text/csv",  "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "dat": "application/octet-stream"}
 
 def definir_mime_type(nombre_archivo: str) -> str:
     nombre_separado = nombre_archivo.split(".")
@@ -74,10 +74,21 @@ def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str) -> str: # Si no se
     #if subir:
     #   print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
     
-    id_carpeta = subir.get("id")
-    print("Las carpetas se crearon con exito.")    
+    id_carpeta = subir.get("id")   
 
     return id_carpeta
+
+#def descargar_archivo_workspace(nombre_archivo: str):
+#    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
+#    mime = definir_mime_type(nombre_archivo)
+#    request = SERVICIO.files().export_media(fileId=id_archivo,
+#                                             mimeType=mime)
+#    fh = io.BytesIO()
+#    downloader = MediaIoBaseDownload(fh, request)
+#    done = False
+#    while not done:
+#        status, done = downloader.next_chunk()
+#        print("Download %d%%." % int(status.progress() * 100))
 
 def descargar_archivo(nombre_archivo: str, ruta: str) -> None:     # Al pasar el string de la ruta destino, poner una "r" antes del string, como si fuera la "f" de format. Ej: descargar_archivo(id_archivo, messi.jpg, r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos")
     
@@ -177,3 +188,10 @@ def obtener_tiempo_modificacion(nombre_archivo: str) -> tuple:
 def borrar_archivo(nombre_archivo: str) -> None:
     id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
     response = SERVICIO.files().delete(fileId=id_archivo).execute()
+
+def obtener_carpeta_madre(nombre_archivo:str) -> str:
+    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
+    carpeta = SERVICIO.files().get(fileId= id_archivo, fields="parents").execute()
+    id_carpeta = carpeta["parents"][0]
+    nombre_carpeta = SERVICIO.files().get(fileId= id_carpeta, fields="name").execute()
+    return nombre_carpeta["name"]
