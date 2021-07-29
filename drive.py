@@ -5,12 +5,15 @@ import pickle
 
 SERVICIO = obtener_servicio()
 
-MIME_TYPES = {"png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
+MIME_TYPES = {"csv": "text/csv",  "png": "image/png", "jpg": "image/jpeg", "jpeg": "image/jpeg", "pdf": "application/pdf", "txt": "text/plain", "bin": "application/octet-stream", "doc": "application/msword", "json": "application/json", "mp3": "audio/mpeg", "ppt": "application/vnd.ms-powerpoint", "rar": "application/vnd.rar", "xls": "application/vnd.ms-excel", "zip": "application/zip", "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
 
 def definir_mime_type(nombre_archivo: str) -> str:
     nombre_separado = nombre_archivo.split(".")
-    extension = nombre_separado[1]
-    mime = MIME_TYPES[extension]
+    if len(nombre_separado) > 1:
+        extension = nombre_separado[1]
+        mime = MIME_TYPES[extension]
+    else:
+        mime = "application/vnd.google-apps.folder"
     
     return mime
 
@@ -22,10 +25,14 @@ def obtener_id(nombre: str, query) -> str:
             return id_carpeta
 
 def subir_archivo(nombre_archivo: str, nombre_carpeta_madre: str, nombre_carpeta_nueva: str, ruta:str) -> None: # Si no quiere subir el archivo adentro de una carpeta, en "nombre_carpeta_madre" pasar string vacio. Si no quiere subir el archivo en una carpeta nueva, en "nombre_carpeta_nueva" pasar string vacio. 
-    id_carpeta_madre = obtener_id(nombre_carpeta_madre, f"mimeType='application/vnd.google-apps.folder' and trashed=False")
+    if nombre_carpeta_madre != "":
+        id_carpeta_madre = obtener_id(nombre_carpeta_madre, f"mimeType='application/vnd.google-apps.folder' and trashed=False")
+    else:
+        id_carpeta_madre = ""
+
     metadata = {"name" : nombre_archivo}
     
-    if ruta != "":
+    if ruta == "":
         directorio = os.path.dirname(os.path.realpath(nombre_archivo))
         ruta = os.path.join(directorio, nombre_archivo)
         
@@ -169,3 +176,5 @@ def obtener_tiempo_modificacion(nombre_archivo: str) -> tuple:
         return (dia, hora_final)
     except:
         return ()
+
+subir_archivo("alumnos.csv", "", "", "")
