@@ -2,6 +2,8 @@ from service_drive import obtener_servicio
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import os, io
 import pickle
+from os import mkdir
+import csv
 
 SERVICIO = obtener_servicio()
 
@@ -70,25 +72,10 @@ def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str) -> str: # Si no se
         metadata["parents"] = parents
 
     subir = SERVICIO.files().create(body=metadata).execute()
-
-    #if subir:
-    #   print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
     
     id_carpeta = subir.get("id")   
 
     return id_carpeta
-
-#def descargar_archivo_workspace(nombre_archivo: str):
-#    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
-#    mime = definir_mime_type(nombre_archivo)
-#    request = SERVICIO.files().export_media(fileId=id_archivo,
-#                                             mimeType=mime)
-#    fh = io.BytesIO()
-#    downloader = MediaIoBaseDownload(fh, request)
-#    done = False
-#    while not done:
-#        status, done = downloader.next_chunk()
-#        print("Download %d%%." % int(status.progress() * 100))
 
 def descargar_archivo(nombre_archivo: str, ruta: str) -> None:     # Al pasar el string de la ruta destino, poner una "r" antes del string, como si fuera la "f" de format. Ej: descargar_archivo(id_archivo, messi.jpg, r"C:\Users\Lucas\Documents\UBA\FIUBA\Algoritmos")
     
@@ -195,3 +182,86 @@ def obtener_carpeta_madre(nombre_archivo:str) -> str:
     id_carpeta = carpeta["parents"][0]
     nombre_carpeta = SERVICIO.files().get(fileId= id_carpeta, fields="name").execute()
     return nombre_carpeta["name"]
+
+# Sistema Carpetas:
+
+def crear_carpetas_local():
+    nombre_carpeta=input("Ingresa el nombre de la carpeta: ")
+    mkdir(nombre_carpeta)
+
+
+def obtener_padrones():
+    padrones={}
+    with open("alumnos.csv", newline='', encoding="UTF-8") as alumnos_csv:
+
+            csv_reader=csv.reader(alumnos_csv, delimiter=',')
+            next(csv_reader)
+            for row in csv_reader:
+                padrones[row[1]]=row[0]
+    return padrones
+
+def crear_datos(condicion, docente_alumno):
+    if condicion== True:
+        #docente_alumno={}{"DOCENTE":[ALUMNO1,ALUMNO2],"DOCENTE2":[ALUMNO1,ALUMNO2]}
+        with open("docentes.csv", newline='', encoding="UTF-8") as archivo_csv:
+
+            csv_reader=csv.reader(archivo_csv, delimiter=',')
+            next(csv_reader)
+            for row in csv_reader:
+
+                docente_alumno[row[0]]=[]
+
+        with open("docente-alumnos.csv", newline='',encoding="UTF-8") as correctores_csv:
+
+            csv_reader=csv.reader(correctores_csv, delimiter=',')
+            next(csv_reader)
+            for row in csv_reader:
+
+                docente_alumno[row[0]].append(row[1])
+        return docente_alumno
+    else:
+        alumnos_sin_docente=[]
+        with open("alumnos.csv", newline='', encoding="UTF-8") as alumnos_csv:
+
+            csv_reader=csv.reader(alumnos_csv, delimiter=',')
+            next(csv_reader)
+            for row in csv_reader:
+
+                alumnos_sin_docente.append(row[0])
+        for docente in docente_alumno.keys():
+
+            for alumno in docente_alumno[docente]:
+
+                if alumno in alumnos_sin_docente:
+
+                    alumnos_sin_docente.remove(alumno)
+        return alumnos_sin_docente
+
+
+def carpetas():
+    verdad=True
+    falso=False
+    docente_alumno={} #{"DOCENTE":[ALUMNO1,ALUMNO2],"DOCENTE2":[ALUMNO1,ALUMNO2]}
+    docente_alumno=crear_datos(verdad,docente_alumno)
+    alumnos_sin_docente=crear_datos(falso,docente_alumno)
+
+    carpeta=input("Ingrese el nombre de la carpeta que contendra la entrega de los alumnos: ")
+    mkdir(carpeta)
+    id_madre = crear_carpeta(carpeta,"")
+
+    for docente in docente_alumno.keys():
+
+        mkdir(f"{carpeta}\\{docente}")
+        id_docente = crear_carpeta(docente, id_madre)
+        for alumno in docente_alumno[docente]:
+
+            mkdir(f"{carpeta}\\{docente}\\{alumno}")
+            crear_carpeta(alumno, id_docente)
+    mkdir(f"{carpeta}\\Alumnos sin docente")
+    id_huerfanos = crear_carpeta("Alumnos sin docente", id_madre)
+    for alumno in alumnos_sin_docente:
+
+        mkdir(f"{carpeta}\\Alumnos sin docente\\{alumno}")
+        crear_carpeta(alumno, id_huerfanos)
+
+    return docente_alumno, alumnos_sin_docente, carpeta
