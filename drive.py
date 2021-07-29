@@ -9,11 +9,8 @@ MIME_TYPES = {"csv": "text/csv",  "png": "image/png", "jpg": "image/jpeg", "jpeg
 
 def definir_mime_type(nombre_archivo: str) -> str:
     nombre_separado = nombre_archivo.split(".")
-    if len(nombre_separado) > 1:
-        extension = nombre_separado[1]
-        mime = MIME_TYPES[extension]
-    else:
-        mime = "application/vnd.google-apps.folder"
+    extension = nombre_separado[1]
+    mime = MIME_TYPES[extension]
     
     return mime
 
@@ -74,11 +71,11 @@ def crear_carpeta(nombre_carpeta: str, id_carpeta_madre: str) -> str: # Si no se
 
     subir = SERVICIO.files().create(body=metadata).execute()
 
-    if subir:
-        print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
+    #if subir:
+    #   print(f"\nLa carpeta {nombre_carpeta} fue creada con exito. ")
     
     id_carpeta = subir.get("id")
-    
+    print("Las carpetas se crearon con exito.")    
 
     return id_carpeta
 
@@ -177,4 +174,6 @@ def obtener_tiempo_modificacion(nombre_archivo: str) -> tuple:
     except:
         return ()
 
-subir_archivo("alumnos.csv", "", "", "")
+def borrar_archivo(nombre_archivo: str) -> None:
+    id_archivo = obtener_id(nombre_archivo, "mimeType!='application/vnd.google-apps.folder' and trashed=False")
+    response = SERVICIO.files().delete(fileId=id_archivo).execute()
